@@ -35,16 +35,16 @@ jobs:
       - run:
           name: Build and push backend image
           command: |
-            docker build -t yesiamkriti/test-circlci-backend:latest ./backend
+            docker build -t yesiamkriti/test-circleci-backend:latest ./backend
             echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
-            docker push yesiamkriti/test-circlci-backend:latest
+            docker push yesiamkriti/test-circleci-backend:latest
 
       - run:
           name: Build and push frontend image
           command: |
-            docker build -t yesiamkriti/test-circlci-frontend:latest ./frontend
+            docker build -t yesiamkriti/test-circleci-frontend:latest ./frontend
             echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
-            docker push yesiamkriti/test-circlci-frontend:latest
+            docker push yesiamkriti/test-circleci-frontend:latest
 
 workflows:
   build_and_test:
