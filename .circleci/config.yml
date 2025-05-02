@@ -1,0 +1,22 @@
+version: 2.1
+
+jobs:
+  build:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+
+      - setup_remote_docker
+
+      - run:
+          name: Build and Run Docker Compose
+          command: |
+            docker-compose up -d --build
+            docker ps
+
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - build
