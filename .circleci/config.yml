@@ -1,22 +1,55 @@
 version: 2.1
 
+orbs:
+  node: circleci/node@5.1.0
+  docker: circleci/docker@2.1.4
+
 jobs:
-  build:
+  build_test:
     docker:
-      - image: cimg/base:stable
+      - image: cimg/node:18.20
     steps:
       - checkout
 
-      - setup_remote_docker
+      - run:
+          name: Install backend dependencies
+          command: |
+            cd backend
+            npm install
 
       - run:
-          name: Build and Run Docker Compose
+          name: Install frontend dependencies
           command: |
-            docker-compose up -d --build
-            docker ps
+            cd frontend
+            npm install
+
+  build_docker_images:
+    docker:
+      - image: cimg/node:18.20
+    steps:
+      - checkout
+
+      - setup_remote_docker:
+          docker_layer_caching: false
+
+      - run:
+          name: Build and push backend image
+          command: |
+            docker build -t yesiamkriti/test-circlci-backend:latest ./backend
+            echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+            docker push yesiamkriti/test-circlci-backend:latest
+
+      - run:
+          name: Build and push frontend image
+          command: |
+            docker build -t yesiamkriti/test-circlci-frontend:latest ./frontend
+            echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+            docker push yesiamkriti/test-circlci-frontend:latest
 
 workflows:
-  version: 2
   build_and_test:
     jobs:
-      - build
+      - build_test
+      - build_docker_images:
+          requires:
+            - build_test
